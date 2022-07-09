@@ -3,6 +3,7 @@ package jade;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 import renderer.Shader;
+import util.Time;
 
 import java.awt.event.KeyEvent;
 import java.nio.FloatBuffer;
@@ -16,7 +17,7 @@ public class LevelEditorScene extends Scene {
 
     private int vertexID, fragmentID, shaderProgram;
 
-    private float[] vertexArray = {
+    private final float[] vertexArray = {
             // position            // color
             100.5f, 0.5f,   0.0f,    1.0f, 0.0f, 0.0f, 1.0f, // Bottom right #0
             0.5f,   100.5f, 0.0f,    0.0f, 1.0f, 0.0f, 1.0f, // Top left     #1
@@ -25,7 +26,7 @@ public class LevelEditorScene extends Scene {
     };
 
     // IMPORTANT: Must be in counter-clockwise order
-    private int[] elementArray = {
+    private final int[] elementArray = {
             /*
                     x       x
 
@@ -86,9 +87,12 @@ public class LevelEditorScene extends Scene {
     @Override
     public void update(float dt) {
 //        camera.position.x -= dt * 50.0f;
+//        camera.position.y -= dt * 20.0f;
+
         defaultShader.use();
         defaultShader.uploadMat4f("uProjection", camera.getProjectionMatrix());
         defaultShader.uploadMat4f("uView", camera.getViewMatrix());
+        defaultShader.uploadFloat("uTime", Time.getTime());
         // Bind the VAO that we're using
         glBindVertexArray(vaoID);
 
