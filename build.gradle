@@ -8,6 +8,7 @@ version '1.0-SNAPSHOT'
 sourceCompatibility = 1.11
 
 repositories {
+    jcenter()
     mavenCentral()
 }
 
@@ -20,21 +21,20 @@ test {
     useJUnitPlatform()
 }
 
-import org.gradle.internal.os.OperatingSystem
-
 project.ext.lwjglVersion = "3.2.3"
+project.ext.lwjglNatives = "natives-windows"
 project.ext.jomlVersion = "1.10.4"
-
-switch (OperatingSystem.current()) {
-    case OperatingSystem.MAC_OS:
-        project.ext.lwjglNatives = "natives-macos"
-        break
-    case OperatingSystem.WINDOWS:
-        project.ext.lwjglNatives = "natives-windows"
-        break
-}
+project.ext.imguiVersion = '1.76-0.9'
 
 dependencies {
+    // ImGUI stuff
+    implementation "io.imgui.java:binding:$imguiVersion"
+    implementation "io.imgui.java:lwjgl3:$imguiVersion"
+
+    // Include all available natives, but it's likely that you want something specific
+    runtimeOnly "io.imgui.java:natives-windows:$imguiVersion"
+
+    // LWJGL stuff
     implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
 
     implementation "org.lwjgl:lwjgl"
