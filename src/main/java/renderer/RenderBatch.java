@@ -14,7 +14,7 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
-public class RenderBatch {
+public class RenderBatch implements Comparable<RenderBatch> {
     // Vertex
     // ======
     // Pos              Color                           tex coords      tex id
@@ -41,8 +41,10 @@ public class RenderBatch {
     private int vaoID, vboID;
     private int maxBatchSize;
     private Shader shader;
+    private int zIndex;
 
-    public RenderBatch(int maxBatchSize) {
+    public RenderBatch(int maxBatchSize, int zIndex) {
+        this.zIndex = zIndex;
         shader = AssetPool.getShader("assets/shaders/default.glsl");
         this.sprites = new SpriteRenderer[maxBatchSize];
         this.maxBatchSize = maxBatchSize;
@@ -63,7 +65,7 @@ public class RenderBatch {
         // Allocate space for vertices
         vboID = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vboID);
-        glBufferData(GL_ARRAY_BUFFER, vertices.length * Float.BYTES, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, (long) vertices.length * Float.BYTES, GL_DYNAMIC_DRAW);
 
         // Create and upload indices buffer
         int eboID = glGenBuffers();
@@ -207,7 +209,7 @@ public class RenderBatch {
     }
 
     private int[] generateIndices() {
-        // 6 indicies per quad (3 per triangle)
+        // 6 indices per quad (3 per triangle)
         int[] elements = new int[6 * maxBatchSize];
         for (int i=0; i < maxBatchSize; i++) {
             loadElementIndices(elements, i);
@@ -224,10 +226,10 @@ public class RenderBatch {
         // Triangle 1
         elements[offsetArrayIndex] = offset + 3;
         elements[offsetArrayIndex + 1] = offset + 2;
-        elements[offsetArrayIndex + 2] = offset + 0;
+        elements[offsetArrayIndex + 2] = offset; // offset + 0
 
         // Triangle 2
-        elements[offsetArrayIndex + 3] = offset + 0;
+        elements[offsetArrayIndex + 3] = offset; // offset + 0
         elements[offsetArrayIndex + 4] = offset + 2;
         elements[offsetArrayIndex + 5] = offset + 1;
     }
@@ -242,5 +244,14 @@ public class RenderBatch {
 
     public boolean hasTexture(Texture tex) {
         return this.textures.contains(tex);
+    }
+
+    public int zIndex() {
+        return this.zIndex;
+    }
+
+    @Override
+    public int compareTo(RenderBatch o) {
+        return Integer.compare(this.zIndex, o.zIndex());
     }
 }
