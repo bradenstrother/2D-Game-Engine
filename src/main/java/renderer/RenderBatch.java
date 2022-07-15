@@ -163,7 +163,11 @@ public class RenderBatch implements Comparable<RenderBatch> {
         int texID = 0;
         if (sprite.getTexture() != null) {
             for (int i = 0; i < textures.size(); i++) {
-                if (textures.get(i) == sprite.getTexture()) {
+                // Fixed bug rendering objects where some objects would not show up properly when loading
+                // == compares two objects 0x23 != 0x43
+                // returns false because they texture(i) and the sprite texture are different objects and
+                // we add a new equals() method
+                if (textures.get(i).equals(sprite.getTexture())) {
                     texID = i + 1;
                     break;
                 }
