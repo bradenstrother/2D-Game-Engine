@@ -10,7 +10,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 public class PropertiesWindow {
 	private GameObject activeGameObject = null;
-	private PickingTexture pickingTexture;
+	private final PickingTexture pickingTexture;
 
 	public PropertiesWindow(PickingTexture pickingTexture) {
 		this.pickingTexture = pickingTexture;
