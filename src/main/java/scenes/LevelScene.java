@@ -1,7 +1,6 @@
 package scenes;
 
 import jade.Window;
-import scenes.Scene;
 
 public class LevelScene extends Scene {
     public LevelScene() {
@@ -12,7 +11,8 @@ public class LevelScene extends Scene {
     }
 
     @Override
-    public void update(float dt) {
+    public void update(float dt) {}
 
-    }
+    @Override
+    public void render() {}
 }
