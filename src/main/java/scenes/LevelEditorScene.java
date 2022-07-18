@@ -3,17 +3,21 @@ package scenes;
 import components.*;
 import imgui.ImGui;
 import imgui.ImVec2;
-import jade.*;
+import jade.Camera;
+import jade.GameObject;
+import jade.Prefabs;
+import jade.Transform;
 import org.joml.Vector2f;
 import util.AssetPool;
 
 public class LevelEditorScene extends Scene {
 
-    private GameObject obj1;
     private Spritesheet sprites;
-    SpriteRenderer obj1Sprite;
 
     GameObject levelEditorStuff = new GameObject("LevelEditor", new Transform(new Vector2f()), 0);
+    //PhysicsSystem2D physics = new PhysicsSystem2D(1.0f / 60.0f, new Vector2f(0, -10));
+    Transform obj1, obj2;
+    //Rigidbody2D rb1, rb2;
 
     public LevelEditorScene() {
 
@@ -29,44 +33,44 @@ public class LevelEditorScene extends Scene {
         levelEditorStuff.addComponent(new MouseControls());
         levelEditorStuff.addComponent(new GridLines());
         levelEditorStuff.addComponent(new EditorCamera(this.camera));
-        levelEditorStuff.addComponent(new TranslateGizmo(gizmos.getSprite(1),
-                Window.getImGuiLayer().getPropertiesWindow()));
+        levelEditorStuff.addComponent(new GizmoSystem(gizmos));
 
         levelEditorStuff.start();
 
-//        DebugDraw.addLine2D(new Vector2f(0,0), new Vector2f(800, 800), new Vector3f(1,0,0), 240);
-
-        // Alpha Blending
-//        obj1 = new GameObject("Object 1", new Transform(new Vector2f(200, 100), new Vector2f(256, 256)), 2);
-//        obj1Sprite = new SpriteRenderer();
-//        obj1Sprite.setColor(new Vector4f(1, 0, 0, 1));
-//        obj1.addComponent(obj1Sprite);
-//        obj1.addComponent(new RigidBody());
-//        this.addGameObjectToScene(obj1);
-//        this.activeGameObject = obj1;
+//        obj1 = new Transform(new Vector2f(100, 500));
+//        obj2 = new Transform(new Vector2f(100, 300));
 //
-//        GameObject obj2 = new GameObject("Object 2", new Transform(new Vector2f(400, 100), new Vector2f(256, 256)), 3);
-//        SpriteRenderer obj2SpriteRenderer = new SpriteRenderer();
-//        Sprite obj2Sprite = new Sprite();
-//        obj2Sprite.setTexture(AssetPool.getTexture("assets/images/blendImage2.png"));
-//        obj2SpriteRenderer.setSprite(obj2Sprite);
-//        obj2.addComponent(obj2SpriteRenderer);
-//        this.addGameObjectToScene(obj2);
+//        rb1 = new Rigidbody2D();
+//        rb2 = new Rigidbody2D();
+//        rb1.setRawTransform(obj1);
+//        rb2.setRawTransform(obj2);
+//        rb1.setMass(100.0f);
+//        rb2.setMass(200.0f);
+//
+//        Circle c1 = new Circle();
+//        c1.setRadius(10.0f);
+//        c1.setRigidbody(rb1);
+//        Circle c2 = new Circle();
+//        c2.setRadius(20.0f);
+//        c2.setRigidbody(rb2);
+//        rb1.setCollider(c1);
+//        rb2.setCollider(c2);
+//
+//        physics.addRigidbody(rb1, true);
+//        physics.addRigidbody(rb2, false);
     }
 
     private void loadResources() {
         AssetPool.getShader("assets/shaders/default.glsl");
 
         AssetPool.addSpritesheet("assets/images/spritesheets/decorationsAndBlocks.png",
-                                new Spritesheet(AssetPool.getTexture("assets/images/spritesheets/decorationsAndBlocks.png"),
-                                        16, 16, 81, 0));
+                new Spritesheet(AssetPool.getTexture("assets/images/spritesheets/decorationsAndBlocks.png"),
+                        16, 16, 81, 0));
         AssetPool.addSpritesheet("assets/images/gizmos.png",
                 new Spritesheet(AssetPool.getTexture("assets/images/gizmos.png"),
-                        24, 48, 2, 0));
+                        24, 48, 3, 0));
         AssetPool.getTexture("assets/images/blendImage2.png");
 
-        // Solves our problem of not loading textures into the scene correctly
-        // Can now use framebuffers and load textures correctly
         for (GameObject g : gameObjects) {
             if (g.getComponent(SpriteRenderer.class) != null) {
                 SpriteRenderer spr = g.getComponent(SpriteRenderer.class);
@@ -77,20 +81,18 @@ public class LevelEditorScene extends Scene {
         }
     }
 
-    float x = 0.0f;
-    float y = 0.0f;
-    float angle = 0.0f;
     @Override
     public void update(float dt) {
         levelEditorStuff.update(dt);
         this.camera.adjustProjection();
-//        DebugDraw.addCircle(new Vector2f(x, y), 64, new Vector3f(0, 1, 0), 1);
-//        x += 50.0f * dt;
-//        y += 50.0f * dt;
 
         for (GameObject go : this.gameObjects) {
             go.update(dt);
         }
+
+//        DebugDraw.addCircle(obj1.position, 10.0f, new Vector3f(1, 0, 0));
+//        DebugDraw.addCircle(obj2.position, 20.0f, new Vector3f(0.2f, 0.8f, 0.1f));
+//        physics.update(dt);
     }
 
     @Override
@@ -116,15 +118,14 @@ public class LevelEditorScene extends Scene {
         float windowX2 = windowPos.x + windowSize.x;
         for (int i=0; i < sprites.size(); i++) {
             Sprite sprite = sprites.getSprite(i);
-            float spriteWidth = sprite.getWidth() * 3;
-            float spriteHeight = sprite.getHeight() * 3;
+            float spriteWidth = sprite.getWidth() * 4;
+            float spriteHeight = sprite.getHeight() * 4;
             int id = sprite.getTexId();
             Vector2f[] texCoords = sprite.getTexCoords();
 
             ImGui.pushID(i);
             if (ImGui.imageButton(id, spriteWidth, spriteHeight, texCoords[2].x, texCoords[0].y, texCoords[0].x, texCoords[2].y)) {
                 GameObject object = Prefabs.generateSpriteObject(sprite, 32, 32);
-                // Attach this to the mouse cursor
                 levelEditorStuff.getComponent(MouseControls.class).pickupObject(object);
             }
             ImGui.popID();

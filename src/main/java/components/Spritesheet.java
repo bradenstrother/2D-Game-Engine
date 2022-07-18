@@ -1,8 +1,6 @@
 package components;
 
-import com.sun.nio.sctp.SctpSocketOption;
 import org.joml.Vector2f;
-import org.lwjgl.system.macosx.LibSystem;
 import renderer.Texture;
 
 import java.util.ArrayList;
@@ -20,16 +18,16 @@ public class Spritesheet {
         int currentX = 0;
         int currentY = texture.getHeight() - spriteHeight;
         for (int i=0; i < numSprites; i++) {
-            float topY = (currentY + spriteHeight) / (float) texture.getHeight();
-            float rightX = (currentX + spriteWidth) / (float) texture.getWidth();
-            float leftX = currentX / (float) texture.getWidth();
-            float bottomY = currentY / (float) texture.getHeight();
+            float topY = (currentY + spriteHeight) / (float)texture.getHeight();
+            float rightX = (currentX + spriteWidth) / (float)texture.getWidth();
+            float leftX = currentX / (float)texture.getWidth();
+            float bottomY = currentY / (float)texture.getHeight();
 
             Vector2f[] texCoords = {
-                    new Vector2f(rightX, topY), // Top right
-                    new Vector2f(rightX, bottomY), // Bottom right
-                    new Vector2f(leftX, bottomY), // Bottom left
-                    new Vector2f(leftX, topY)  // Top left
+                    new Vector2f(rightX, topY),
+                    new Vector2f(rightX, bottomY),
+                    new Vector2f(leftX, bottomY),
+                    new Vector2f(leftX, topY)
             };
             Sprite sprite = new Sprite();
             sprite.setTexture(this.texture);
