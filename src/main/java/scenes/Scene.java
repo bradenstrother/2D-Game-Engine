@@ -78,7 +78,13 @@ public abstract class Scene {
 
         try {
             FileWriter writer = new FileWriter("level.txt");
-            writer.write(gson.toJson(this.gameObjects));
+            List<GameObject> objsToSerialize = new ArrayList<>();
+            for (GameObject obj : this.gameObjects) {
+                if (obj.isSetSerialization()) {
+                    objsToSerialize.add(obj);
+                }
+            }
+            writer.write(gson.toJson(objsToSerialize));
             writer.close();
         } catch(IOException e) {
             e.printStackTrace();
@@ -103,16 +109,16 @@ public abstract class Scene {
             int maxGoId = -1;
             int maxCompId = -1;
             GameObject[] objs = gson.fromJson(inFile, GameObject[].class);
-            for (int i=0; i < objs.length; i++) {
-                addGameObjectToScene(objs[i]);
+            for (GameObject obj : objs) {
+                addGameObjectToScene(obj);
 
-                for (Component c : objs[i].getAllComponents()) {
+                for (Component c : obj.getAllComponents()) {
                     if (c.getUid() > maxCompId) {
                         maxCompId = c.getUid();
                     }
                 }
-                if (objs[i].getUid() > maxGoId) {
-                    maxGoId = objs[i].getUid();
+                if (obj.getUid() > maxGoId) {
+                    maxGoId = obj.getUid();
                 }
             }
 

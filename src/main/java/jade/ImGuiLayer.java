@@ -11,6 +11,8 @@ import imgui.type.ImBoolean;
 import renderer.PickingTexture;
 import scenes.Scene;
 
+import java.util.Objects;
+
 import static org.lwjgl.glfw.GLFW.*;
 
 public class ImGuiLayer {
@@ -23,8 +25,8 @@ public class ImGuiLayer {
     // LWJGL3 renderer (SHOULD be initialized)
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
 
-    private GameViewWindow gameViewWindow;
-    private PropertiesWindow propertiesWindow;
+    private final GameViewWindow gameViewWindow;
+    private final PropertiesWindow propertiesWindow;
 
     public ImGuiLayer(Long glfwWindow, PickingTexture pickingTexture) {
         this.glfwWindow = glfwWindow;
@@ -150,11 +152,7 @@ public class ImGuiLayer {
             @Override
             public String get() {
                 final String clipboardString = glfwGetClipboardString(glfwWindow);
-                if (clipboardString != null) {
-                    return clipboardString;
-                } else {
-                    return "";
-                }
+                return Objects.requireNonNullElse(clipboardString, "");
             }
         });
 
@@ -253,5 +251,9 @@ public class ImGuiLayer {
 
         // Dockspace
         ImGui.dockSpace(ImGui.getID("Dockspace"));
+    }
+
+    public PropertiesWindow getPropertiesWindow() {
+        return this.propertiesWindow;
     }
 }
